@@ -4,4 +4,4 @@ en:
       label: Box Search
       go: Go
       box_placeholder: box
-      collection_placeholder: collection (optional)
+      collection_placeholder: collection
