@@ -2,20 +2,23 @@ require 'uri'
 
 class BoxSearchController < ApplicationController
 
-  set_access_control  "view_repository" => [:index]
+  set_access_control  "view_repository" => [:index, :search]
 
   def index
   end
 
 
-  def bulk_operation_search
+  class MissingFilterException < Exception; end
+
+
+  def search
     begin
       results = perform_search
     rescue MissingFilterException
       return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
     end
 
-    render_aspace_partial :partial => "top_containers/bulk_operations/results", :locals => {:results => results}
+    render_aspace_partial :partial => "box_search/results", :locals => {:results => results}
   end
 
 
@@ -40,21 +43,8 @@ class BoxSearchController < ApplicationController
 
     filters = []
 
-    filters.push({'collection_uri_u_sstr' => params['collection_resource']['ref']}.to_json) if params['collection_resource']
-    filters.push({'collection_uri_u_sstr' => params['collection_accession']['ref']}.to_json) if params['collection_accession']
-
-    filters.push({'container_profile_uri_u_sstr' => params['container_profile']['ref']}.to_json) if params['container_profile']
-    filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
-    unless params['exported'].blank?
-      filters.push({'exported_u_sbool' => (params['exported'] == "yes" ? true : false)}.to_json)
-    end
-    unless params['empty'].blank?
-      filters.push({'empty_u_sbool' => (params['empty'] == "yes" ? true : false)}.to_json)
-    end
-
-    if filters.empty? && params['q'].blank?
-      raise MissingFilterException.new
-    end
+    filters.push({'display_string' => params['indicator']}.to_json) unless params['indicator'].blank?
+    filters.push({'collection_identifier_stored_u_sstr' => params['collection']}.to_json) unless params['collection'].blank?
 
     unless filters.empty?
       search_params = search_params.merge({

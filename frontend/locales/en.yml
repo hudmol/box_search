@@ -3,5 +3,5 @@ en:
     box_search:
       label: Box Search
       go: Go
-      box_placeholder: Box number
-      collection_placeholder: Collection number (optional)
+      box_placeholder: box
+      collection_placeholder: collection (optional)
