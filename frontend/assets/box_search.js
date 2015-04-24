@@ -29,8 +29,12 @@ BoxSearch.prototype.perform_search = function(data) {
 		type: "post",
 		success: function(html) {
 		  self.$results_container.html(html);
-		  $(".box-search-field")[0].focus();
-		  $(".box-search-field")[0].select();
+		  var focus_field = $(".box-search-field")[0];
+		  if (focus_field.value == "" && $(".box-search-field")[1].value != "") {
+		      focus_field = $(".box-search-field")[1];
+		  }
+		  focus_field.focus();
+		  focus_field.select();
 	        },
 		error: function(jqXHR, textStatus, errorThrown) {
 		  var html = AS.renderTemplate("template_box_search_error_message", {message: jqXHR.responseText})
