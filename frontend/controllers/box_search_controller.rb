@@ -34,7 +34,7 @@ class BoxSearchController < ApplicationController
 
     filters = []
 
-    filters.push({'display_string' => params['indicator']}.to_json) unless params['indicator'].blank?
+    filters.push({'indicator_u_sstr' => params['indicator']}.to_json) unless params['indicator'].blank?
     filters.push({'collection_identifier_stored_u_sstr' => params['collection']}.to_json) unless params['collection'].blank?
 
     if filters.empty?
