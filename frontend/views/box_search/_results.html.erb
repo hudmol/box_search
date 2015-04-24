@@ -31,9 +31,11 @@
             </ul>
           <% end %>
         </td>
-        <td class="top-container-indicator"><%= container_json['indicator'] %></td>
+        <td class="top-container-indicator">
+          <%= link_to container_json['display_string'], {:controller => :resolver, :action => :resolve_readonly, :uri => container_json["uri"]} %>
+        </td>
 
-        <td>
+        <td class="top-container-location">
           <% locations = container_json['container_locations'].select { |v| v['status'] == "current"  } %>
           <% unless locations.empty? %>
             <% location = locations.first['_resolved'] %>
