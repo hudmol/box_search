@@ -15,7 +15,7 @@ class BoxSearchController < ApplicationController
     begin
       results = perform_search
     rescue MissingFilterException
-      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
+      return render :text => I18n.t("plugins.box_search.no_term_message"), :status => 500
     end
 
     render_aspace_partial :partial => "box_search/results", :locals => {:results => results}
@@ -27,15 +27,6 @@ class BoxSearchController < ApplicationController
 
   include ApplicationHelper
 
-  def search_filter_for(uri)
-    return {} if uri.blank?
-
-    return {
-      "filter_term[]" => [{"collection_uri_u_sstr" => uri}.to_json]
-    }
-  end
-
-
   def perform_search
     search_params = params_for_backend_search.merge({
                                                       'type[]' => ['top_container']
@@ -45,6 +36,10 @@ class BoxSearchController < ApplicationController
 
     filters.push({'display_string' => params['indicator']}.to_json) unless params['indicator'].blank?
     filters.push({'collection_identifier_stored_u_sstr' => params['collection']}.to_json) unless params['collection'].blank?
+
+    if filters.empty?
+      raise MissingFilterException.new
+    end
 
     unless filters.empty?
       search_params = search_params.merge({

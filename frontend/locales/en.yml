@@ -5,3 +5,4 @@ en:
       go: Go
       box_placeholder: box
       collection_placeholder: collection
+      no_term_message: Please enter a box number and/or a collection number
