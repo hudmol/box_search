@@ -9,7 +9,7 @@ function BoxSearch($search_form, $results_container) {
 BoxSearch.prototype.setup_form = function() {
     var self = this;
 
-    $(".search-field")[0].focus();
+    $(".box-search-field")[0].focus();
 
     this.$search_form.on("submit", function(event) {
 	    event.preventDefault();
@@ -29,11 +29,11 @@ BoxSearch.prototype.perform_search = function(data) {
 		type: "post",
 		success: function(html) {
 		  self.$results_container.html(html);
-		  $(".search-field")[0].focus();
-		  $(".search-field")[0].select();
+		  $(".box-search-field")[0].focus();
+		  $(".box-search-field")[0].select();
 	        },
 		error: function(jqXHR, textStatus, errorThrown) {
-		  var html = AS.renderTemplate("box_search_error_message", {message: jqXHR.responseText})
+		  var html = AS.renderTemplate("template_box_search_error_message", {message: jqXHR.responseText})
 		    self.$results_container.html(html);
 	        }
 	});

@@ -33,9 +33,12 @@
         </td>
         <td class="top-container-indicator"><%= container_json['indicator'] %></td>
 
-        <% location = container_json['container_locations'].select { |v| v['status'] == "current"  }.first['_resolved'] %>
         <td>
-          <a href="<%= location['uri'] %>"><%= location['title'] %></a>
+          <% locations = container_json['container_locations'].select { |v| v['status'] == "current"  } %>
+          <% unless locations.empty? %>
+            <% location = locations.first['_resolved'] %>
+            <a href="<%= location['uri'] %>"><%= location['title'] %></a>
+          <% end %>
         </td>
       </tr>
     <% end %>

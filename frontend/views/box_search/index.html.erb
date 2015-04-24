@@ -10,8 +10,8 @@
       <h2>
         <%= I18n.t "plugins.box_search.label" %>
         &nbsp;&raquo;
-        <input name="indicator" class="search-field" placeholder="<%= I18n.t 'plugins.box_search.box_placeholder' %>">
-        <input name="collection" class="search-field" placeholder="<%= I18n.t 'plugins.box_search.collection_placeholder' %>">
+        <input name="indicator" class="box-search-field" placeholder="<%= I18n.t 'plugins.box_search.box_placeholder' %>">
+        <input name="collection" class="box-search-field" placeholder="<%= I18n.t 'plugins.box_search.collection_placeholder' %>">
         <%= submit_tag I18n.t("plugins.box_search.go"), :class => "btn btn-primary" %>
 
       </h2>
@@ -27,6 +27,11 @@
 
 
 <div id="template_box_search_results"><!--
+--></div>
+<div id="template_box_search_error_message"><!--
+  <div id="alertBucket" class="alert alert-error">
+    ${message}
+  </div>
 --></div>
 
 <script src="<%= "#{AppConfig[:frontend_prefix]}assets/box_search.js" %>"></script>
