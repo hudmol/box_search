@@ -43,7 +43,7 @@ class BoxSearchController < ApplicationController
 
     filters = []
 
-    search_params['q'] = "indicator_u_stext:*#{solr_escape(params['indicator'])}*" unless params['indicator'].blank?
+    search_params['q'] = "indicator_u_stext:#{solr_escape(params['indicator'])}" unless params['indicator'].blank?
     filters.push({'collection_identifier_stored_u_sstr' => params['collection']}.to_json) unless params['collection'].blank?
 
     if filters.empty? && !search_params.has_key?('q')
