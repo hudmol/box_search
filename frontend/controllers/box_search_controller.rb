@@ -8,13 +8,13 @@ class BoxSearchController < ApplicationController
   end
 
 
-  class MissingFilterException < Exception; end
+  class MissingTermException < Exception; end
 
 
   def search
     begin
       results = perform_search
-    rescue MissingFilterException
+    rescue MissingTermException
       return render :text => I18n.t("plugins.box_search.no_term_message"), :status => 500
     end
 
@@ -27,6 +27,15 @@ class BoxSearchController < ApplicationController
 
   include ApplicationHelper
 
+
+  SOLR_CHARS = '+-&|!(){}[]^"~*?:\\/'
+
+  def solr_escape(s)
+    pattern = Regexp.quote(SOLR_CHARS)
+    s.gsub(/([#{pattern}])/, "\#{\1}")
+  end
+
+
   def perform_search
     search_params = params_for_backend_search.merge({
                                                       'type[]' => ['top_container']
@@ -34,11 +43,11 @@ class BoxSearchController < ApplicationController
 
     filters = []
 
-    filters.push({'display_string' => params['indicator']}.to_json) unless params['indicator'].blank?
+    search_params['q'] = "indicator_u_stext:#{solr_escape(params['indicator'])}" unless params['indicator'].blank?
     filters.push({'collection_identifier_stored_u_sstr' => params['collection']}.to_json) unless params['collection'].blank?
 
-    if filters.empty?
-      raise MissingFilterException.new
+    if filters.empty? && !search_params.has_key?('q')
+      raise MissingTermException.new
     end
 
     unless filters.empty?
