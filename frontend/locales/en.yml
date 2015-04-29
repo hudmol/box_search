@@ -7,3 +7,4 @@ en:
       collection_placeholder: collection
       no_term_message: Please enter a box number and/or a collection number
       help_message: Please enter a box number and/or a collection number
+      indicator_label: Box number
