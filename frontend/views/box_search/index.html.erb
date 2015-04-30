@@ -4,28 +4,54 @@
 
 <%
   form_target = {:controller => :box_search, :action => :search} if form_target.nil?
+
+  if params['collection_resource'].blank?
+    selected_json = "{}"
+  else
+    selected_json = params['collection_resource']['_resolved']
+  end
 %>
+
 <div class="row-fluid">
   <div class="span6">
     <%= form_tag(form_target, {:class => "form-horizontal", :id => "box_search_form"}) do |f| %>
       <h1><%= I18n.t "plugins.box_search.label" %></h1>
-      <div class="control-group">
-        <label class="control-label" for="indicator"><%= I18n.t("plugins.box_search.indicator_label") %></label>
-        <div class="controls">
+      <fieldset>
+        <div class="form-group">
+          <label class="control-label" for="indicator"><%= I18n.t("plugins.box_search.indicator_label") %></label>
           <%= text_field_tag "indicator", params["indicator"], :style => "width: 100%;", :class => "box-search-field" %>
         </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label" for="collection_resource"><%= I18n.t("top_container._frontend.bulk_operations.collection_resource_singular") %></label>
-        <div class="controls">
-          <%= render_aspace_partial :partial => "top_containers/bulk_operations/collection_resource_linker" %>
+        <div class="form-group">
+          <label class="control-label" for="collection_resource"><%= I18n.t("top_container._frontend.bulk_operations.collection_resource_singular") %></label>
+          <div class="controls">
+            <div class="input-group linker-wrapper">
+              <input type="text" class="linker"
+                     id="collection_resource"
+                     data-label="<%= I18n.t("top_container._frontend.bulk_operations.collection_resource_singular") %>"
+                     data-label_plural="<%= I18n.t("top_container._frontend.bulk_operations.collection_resource_plural") %>"
+                     data-name="ref"
+                     data-path="collection_resource"
+                     data-url="<%= url_for  :controller => :search, :action => :do_search, :format => :json %>"
+                     data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => [], :sort => "title_sort asc" %>"
+                     data-selected="<%= selected_json %>"
+                     data-multiplicity="one"
+                     data-types='<%= ['resource'].to_json %>'
+              />
+              <div class="input-group-btn">
+                <a class="btn btn-default dropdown-toggle last" data-toggle="dropdown" href="javascript:void(0);">
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="javascript:void(0);" class="linker-browse-btn"><%= I18n.t("actions.browse") %></a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="control-group">
-        <div class="controls">
-          <%= submit_tag I18n.t("plugins.box_search.go"), :class => "btn btn-primary pull-right" %>
+        <div class="form-group">
+          <%= submit_tag I18n.t("plugins.box_search.go"), :class => "btn btn-primary" %>
         </div>
-      </div>
+      </fieldset>
     <% end %>
   </div>
 </div>

@@ -2,7 +2,7 @@ en:
   plugins:
     box_search:
       label: Box Search
-      go: Go
+      go: Search
       box_placeholder: box
       collection_placeholder: collection
       no_term_message: Please enter a box number and/or a collection number
