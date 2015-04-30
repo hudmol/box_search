@@ -8,6 +8,13 @@ class CommonIndexer
       end
     }
 
+
+    indexer.add_document_prepare_hook {|doc, record|
+      if record['record']['jsonmodel_type'] == 'resource'
+        doc['display_string'] = (0..3).map {|n| record['record']["id_#{n}"]}.compact.join(" ") + ' -- ' + record['record']['title']
+      end
+    }
+
   end
 
 
