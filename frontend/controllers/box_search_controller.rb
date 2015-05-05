@@ -2,7 +2,7 @@ require 'uri'
 
 class BoxSearchController < ApplicationController
 
-  set_access_control  "view_repository" => [:index, :search]
+  set_access_control  "view_repository" => [:index, :search, :linker_search, :typeahead]
 
   def index
   end
@@ -22,6 +22,35 @@ class BoxSearchController < ApplicationController
   end
 
 
+  def typeahead
+    search_params = params_for_backend_search
+
+    render :json => Search.all(session[:repo_id], search_params)
+  end
+
+
+  def linker_search
+    @search_data = Search.all(session[:repo_id], params_for_backend_search.merge({"facet[]" => SearchResultData.BASE_FACETS.concat(params[:facets]||[]).uniq}).merge({"q" => solr_escape(params["q"])}))
+
+    respond_to do |format|
+      format.json {
+        render :json => @search_data
+      }
+      format.js {
+        if params[:listing_only]
+          render_aspace_partial :partial => "search/listing"
+        else
+          render_aspace_partial :partial => "search/results"
+        end
+      }
+      format.html {
+        render "search/do_search"
+      }
+    end
+  end
+
+
+
   private
 
 
@@ -31,6 +60,7 @@ class BoxSearchController < ApplicationController
   SOLR_CHARS = '+-&|!(){}[]^"~*?:\\/'
 
   def solr_escape(s)
+    return unless s
     pattern = Regexp.quote(SOLR_CHARS)
     s.gsub(/([#{pattern}])/, "\#{\1}")
   end
@@ -59,6 +89,8 @@ class BoxSearchController < ApplicationController
     container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
     JSONModel::HTTP::get_json(container_search_url, search_params)
   end
+
+
 
 end
 
