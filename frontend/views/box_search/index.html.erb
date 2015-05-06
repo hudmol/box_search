@@ -1,20 +1,48 @@
+<%= setup_context(:title => I18n.t("plugins.box_search.label")) %>
+
 <link href="<%= "#{AppConfig[:frontend_prefix]}assets/box_search.css" %>" media="all" rel="stylesheet" type="text/css"/>
 
 <%
   form_target = {:controller => :box_search, :action => :search} if form_target.nil?
-%>
-<div class="row-fluid">
-  <div class="span2"></div>
-  <div class="span10">
-    <%= form_tag(form_target, {:class => "form-horizontal", :id => "box_search_form"}) do |f| %>
-      <h2>
-        <%= I18n.t "plugins.box_search.label" %>
-        &nbsp;&raquo;
-        <input name="indicator" class="box-search-field" placeholder="<%= I18n.t 'plugins.box_search.box_placeholder' %>">
-        <input name="collection" class="box-search-field" placeholder="<%= I18n.t 'plugins.box_search.collection_placeholder' %>">
-        <%= submit_tag I18n.t("plugins.box_search.go"), :class => "btn btn-primary" %>
 
-      </h2>
+  if params['collection_resource'].blank?
+    selected_json = "{}"
+  else
+    selected_json = params['collection_resource']['_resolved']
+  end
+%>
+
+<div class="row-fluid">
+  <div class="span6">
+    <%= form_tag(form_target, {:class => "form-horizontal", :id => "box_search_form"}) do |f| %>
+      <h1><%= I18n.t "plugins.box_search.label" %></h1>
+      <fieldset>
+        <div class="form-group">
+          <label class="control-label" for="indicator"><%= I18n.t("plugins.box_search.indicator_label") %></label>
+          <%= text_field_tag "indicator", params["indicator"], :style => "width: 100%;", :class => "box-search-field" %>
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="collection_resource">Collection</label>
+          <div class="controls">
+            <div class="input-group linker-wrapper">
+              <input type="text" class="linker"
+                     id="collection_resource"
+                     data-label="<%= I18n.t("top_container._frontend.bulk_operations.collection_resource_singular") %>"
+                     data-label_plural="<%= I18n.t("top_container._frontend.bulk_operations.collection_resource_plural") %>"
+                     data-name="ref"
+                     data-path="collection_resource"
+                     data-url="<%= url_for  :controller => :box_search, :action => :linker_search, :format => :json %>"
+                     data-selected="<%= selected_json %>"
+                     data-multiplicity="one"
+                     data-types='<%= ['resource'].to_json %>'
+              />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= submit_tag I18n.t("plugins.box_search.go"), :class => "btn btn-primary" %>
+        </div>
+      </fieldset>
     <% end %>
   </div>
 </div>

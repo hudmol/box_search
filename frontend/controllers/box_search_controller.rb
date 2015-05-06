@@ -2,7 +2,7 @@ require 'uri'
 
 class BoxSearchController < ApplicationController
 
-  set_access_control  "view_repository" => [:index, :search]
+  set_access_control  "view_repository" => [:index, :search, :linker_search]
 
   def index
   end
@@ -22,18 +22,51 @@ class BoxSearchController < ApplicationController
   end
 
 
+  def linker_search
+    query_string = process_query(params["q"])
+
+    @search_data = Search.all(session[:repo_id], params_for_backend_search.merge({"facet[]" => SearchResultData.BASE_FACETS.concat(params[:facets]||[]).uniq}).merge({"q" => query_string}))
+
+    respond_to do |format|
+      format.json {
+        render :json => @search_data
+      }
+      format.js {
+        if params[:listing_only]
+          render_aspace_partial :partial => "search/listing"
+        else
+          render_aspace_partial :partial => "search/results"
+        end
+      }
+      format.html {
+        render "search/do_search"
+      }
+    end
+  end
+
+
+
   private
 
 
-  include ApplicationHelper
+  def process_query(q)
+    # The linker uses a wildcard query by default, which works sometimes but
+    # fails with punctuation and case variations.  Perform a regular tokenized
+    # query too.
+    no_wildcard = q.gsub(/\*/, '')
 
+    result = "\"#{no_wildcard}\"~2"
 
-  SOLR_CHARS = '+-&|!(){}[]^"~*?:\\/'
+    if q !~ /\s/
+      # If there's no whitespace you can have your wildcard back...
+      result = "(#{result} OR #{result}*)"
+    end
 
-  def solr_escape(s)
-    pattern = Regexp.quote(SOLR_CHARS)
-    s.gsub(/([#{pattern}])/, "\#{\1}")
+    result
   end
+
+
+  include ApplicationHelper
 
 
   def perform_search
@@ -43,8 +76,8 @@ class BoxSearchController < ApplicationController
 
     filters = []
 
-    search_params['q'] = "indicator_u_stext:#{solr_escape(params['indicator'])}" unless params['indicator'].blank?
-    filters.push({'collection_identifier_stored_u_sstr' => params['collection']}.to_json) unless params['collection'].blank?
+    search_params['q'] = "indicator_u_stext:\"#{params['indicator']}\"~2" unless params['indicator'].blank?
+    filters.push({'collection_uri_u_sstr' => params['collection_resource']['ref']}.to_json) if params['collection_resource']
 
     if filters.empty? && !search_params.has_key?('q')
       raise MissingTermException.new
@@ -59,6 +92,8 @@ class BoxSearchController < ApplicationController
     container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
     JSONModel::HTTP::get_json(container_search_url, search_params)
   end
+
+
 
 end
 
