@@ -2,7 +2,7 @@ require 'uri'
 
 class BoxSearchController < ApplicationController
 
-  set_access_control  "view_repository" => [:index, :search, :linker_search, :typeahead]
+  set_access_control  "view_repository" => [:index, :search, :linker_search]
 
   def index
   end
@@ -19,13 +19,6 @@ class BoxSearchController < ApplicationController
     end
 
     render_aspace_partial :partial => "box_search/results", :locals => {:results => results}
-  end
-
-
-  def typeahead
-    search_params = params_for_backend_search
-
-    render :json => Search.all(session[:repo_id], search_params)
   end
 
 
