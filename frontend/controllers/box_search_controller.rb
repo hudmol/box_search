@@ -59,7 +59,7 @@ class BoxSearchController < ApplicationController
 
     if q !~ /\s/
       # If there's no whitespace you can have your wildcard back...
-      result = "(#{result} OR q)"
+      result = "(identifier:#{result} OR identifier:#{q})"
     end
 
     result
