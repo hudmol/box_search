@@ -30,7 +30,9 @@ class BoxSearchController < ApplicationController
 
 
   def linker_search
-    @search_data = Search.all(session[:repo_id], params_for_backend_search.merge({"facet[]" => SearchResultData.BASE_FACETS.concat(params[:facets]||[]).uniq}).merge({"q" => solr_escape(params["q"])}))
+    query_string = process_query(params["q"])
+
+    @search_data = Search.all(session[:repo_id], params_for_backend_search.merge({"facet[]" => SearchResultData.BASE_FACETS.concat(params[:facets]||[]).uniq}).merge({"q" => query_string}))
 
     respond_to do |format|
       format.json {
@@ -54,16 +56,24 @@ class BoxSearchController < ApplicationController
   private
 
 
-  include ApplicationHelper
+  def process_query(q)
+    # The linker uses a wildcard query by default, which works sometimes but
+    # fails with punctuation and case variations.  Perform a regular tokenized
+    # query too.
+    no_wildcard = q.gsub(/\*/, '')
 
+    result = "\"#{no_wildcard}\"~2"
 
-  SOLR_CHARS = '+-&|!(){}[]^"~*?:\\/'
+    if q !~ /\s/
+      # If there's no whitespace you can have your wildcard back...
+      result = "(#{result} OR #{result}*)"
+    end
 
-  def solr_escape(s)
-    return unless s
-    pattern = Regexp.quote(SOLR_CHARS)
-    s.gsub(/([#{pattern}])/, "\#{\1}")
+    result
   end
+
+
+  include ApplicationHelper
 
 
   def perform_search
@@ -73,7 +83,7 @@ class BoxSearchController < ApplicationController
 
     filters = []
 
-    search_params['q'] = "indicator_u_stext:#{solr_escape(params['indicator'])}" unless params['indicator'].blank?
+    search_params['q'] = "indicator_u_stext:\"#{params['indicator']}\"~2" unless params['indicator'].blank?
     filters.push({'collection_uri_u_sstr' => params['collection_resource']['ref']}.to_json) if params['collection_resource']
 
     if filters.empty? && !search_params.has_key?('q')
