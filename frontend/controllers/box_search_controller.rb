@@ -25,7 +25,7 @@ class BoxSearchController < ApplicationController
   def linker_search
     query_string = process_query(params["q"])
 
-    @search_data = Search.all(session[:repo_id], params_for_backend_search.merge({"facet[]" => SearchResultData.BASE_FACETS.concat(params[:facets]||[]).uniq}).merge({"q" => query_string}))
+    @search_data = Search.all(session[:repo_id], params_for_backend_search.merge({"q" => query_string}))
 
     respond_to do |format|
       format.json {
@@ -59,7 +59,7 @@ class BoxSearchController < ApplicationController
 
     if q !~ /\s/
       # If there's no whitespace you can have your wildcard back...
-      result = "(#{result} OR #{result}*)"
+      result = "(#{result} OR q)"
     end
 
     result
