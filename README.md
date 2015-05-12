@@ -22,6 +22,22 @@ ArchivesSpace plugins directory.  For example:
      cd /path/to/your/archivesspace/plugins
      git clone https://github.com/hudmol/box_search.git box_search
 
+Or if you are after a particular release, download and unzip it from here:
+
+https://github.com/hudmol/box_search/releases
+
+When installing or upgrading this plugin it will be neceesary to reindex some of the records
+in your system (resources and top_containers). The plugin includes a database migration
+that will trigger the reindex. Run the migration like this:
+
+      cd /path/to/archivesspace
+      scripts/setup-database.sh
+
+Or if you are running in dev mode, you can force a complete reindex like this:
+
+      cd /path/to/archivesspace/build
+      rm -rf indexer_state
+
 
 ## How to use it
 
@@ -29,7 +45,7 @@ Click the gear icon in the repository toolbar.
 Hover over the `Plug-ins` item in the dropdown and click on `Box Search` when it appears.
 
 - Enter a box number (also known as container indicator).
-- Enter an optional collection number (also known as resource identifier).
-- Hit return, or click `Go`.
+- Optionally enter a collection number (also known as resource identifier).
+- Hit return, or click `Search`.
 
-Information about the box will appear below, including its current location.
+Information about matching boxes will appear below, including their current location.
