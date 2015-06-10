@@ -14,7 +14,7 @@ including an entry such as:
 
      # If you have other plugins loaded, just add 'box_search' to
      # the list
-     AppConfig[:plugins] = ['local', 'other_plugins', 'managed_containers', 'box_search']
+     AppConfig[:plugins] = ['local', 'other_plugins', 'container_management', 'box_search']
 
 And then clone the `box_search` repository into your
 ArchivesSpace plugins directory.  For example:
